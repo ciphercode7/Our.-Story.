@@ -1,0 +1,121 @@
+import { useEffect, useMemo, useState } from "react";
+import { ArrowDown, ArrowRight, ArrowUpRight, Check, Heart, LockKeyhole, Mail, Play, Sparkles, X } from "lucide-react";
+
+const SECRET_PASSWORD = "September10";
+
+const memories = [
+  { chapter: "01 / Before we met", title: "Some stories begin long before two people meet.", body: "Long before we knew each other's names, you were already becoming the amazing person I would one day fall in love with. Looking back now, it feels like destiny had already started writing our story.", quote: "Some stories begin long before two people meet.", image: "./media/2025-05-19 19.07.18.png", tint: "rose" },
+  { chapter: "02 / Somewhere else", title: "The same sky watched over both of us.", body: "While you were living your story, I was living mine. We had never met. We didn't know each other's names. Yet somehow, destiny was quietly bringing us closer.", quote: "The same sky watched over both of us.", image: "./media/IMG_20260731_010424_592.jpg", tint: "lavender" },
+  { chapter: "03 / Time passed", title: "Time was preparing two hearts for one story.", body: "The years slowly went by. We laughed. We learned. We grew. Neither of us knew it yet, but every passing day was bringing us closer to the moment our lives would finally meet.", quote: "Time was preparing two hearts for one story.", image: "./media/IMG_20260731_010848_901.jpg", tint: "peach" },
+  { chapter: "04 / Almost there", title: "Sometimes destiny works in silence.", body: "We were getting closer. Still strangers. Still living completely different lives. Neither of us knew it yet, but fate was quietly preparing the day we would finally meet.", quote: "Sometimes destiny works in silence.", image: "./media/IMG_20260731_010931_132.jpg", tint: "plum" },
+  { chapter: "05 / Then we finally met", title: "Out of all the people we could have met… somehow, our paths crossed.", body: "Out of all the schools, classrooms, and people we could have met, somehow our paths crossed. And from that moment, our story truly began.", quote: "Some meetings change your whole life.", image: "./media/IMG_20260731_130733_420.jpg", tint: "gold" },
+];
+
+const chatScenes = [
+  ["Every morning...", "somehow became brighter.", "./media/Screenshot_2026-07-31-22-22-05.png"],
+  ["Because I knew...", "I'd get to talk to you.", "./media/Screenshot_2026-07-31-22-23-56.png"],
+  ["Somehow...", "your messages became my favorite notifications.", "./media/Screenshot_2026-07-31-22-18-54.png"],
+  ["I never got tired...", "of hearing about your day.", "./media/Screenshot_2026-07-31-22-29-11.png"],
+  ["We could talk...", "about absolutely nothing...", "./media/Screenshot_2026-07-31-22-35-17.png"],
+  ["Yet somehow...", "those became my favorite conversations.", "./media/Screenshot_2026-07-31-22-36-12.png"],
+  ["You never had to be perfect...", "because you were already enough.", "./media/Screenshot_2026-07-31-22-37-26.png"],
+  ["Without realizing it...", "you became my favorite part of every day.", "./media/Screenshot_2026-07-31-22-34-33.png"],
+];
+
+const gallery = [
+  ["./media/IMG_20260731_130750_563.jpg", "😂 One of our random moments"],
+  ["./media/IMG_20260731_132105_362.jpg", "❤️ Just you being yourself makes me smile"],
+  ["./media/IMG_20260731_160327_457.jpg", "✨ A memory I keep close — and a reminder that you trusted me with it 💕"],
+];
+
+const loveNotes = ["You make ordinary days feel like little celebrations.", "I love the way you make me laugh when I least expect it.", "You are my favorite person to tell everything to."];
+
+export default function Home() {
+  const [password, setPassword] = useState("");
+  const [unlocked, setUnlocked] = useState(false);
+  const [error, setError] = useState("");
+  const [letterOpen, setLetterOpen] = useState(false);
+  const [finalLetterOpen, setFinalLetterOpen] = useState(false);
+  const [noteIndex, setNoteIndex] = useState(0);
+  const [phoneStage, setPhoneStage] = useState<0 | 1 | 2 | 3 | 4>(0);
+  const [coverOpen, setCoverOpen] = useState(true);
+  const [reply, setReply] = useState("");
+  const [replySent, setReplySent] = useState(false);
+
+  const stars = useMemo(() => Array.from({ length: 42 }, (_, index) => ({ id: index, left: `${(index * 37) % 100}%`, top: `${(index * 53) % 100}%`, delay: `${(index % 7) * 0.4}s`, size: `${index % 3 === 0 ? 3 : 2}px` })), []);
+
+  useEffect(() => {
+    const sections = document.querySelectorAll("[data-reveal]");
+    const observer = new IntersectionObserver((entries) => entries.forEach((entry) => { if (entry.isIntersecting) entry.target.classList.add("is-visible"); }), { threshold: 0.12 });
+    sections.forEach((section) => observer.observe(section));
+    return () => observer.disconnect();
+  }, [unlocked]);
+
+  const unlock = () => {
+    if (password.trim() === SECRET_PASSWORD) {
+      setError(""); setUnlocked(true);
+      window.setTimeout(() => document.getElementById("story")?.scrollIntoView({ behavior: "smooth" }), 120);
+    } else setError("That is not the secret word — try again, my love.");
+  };
+
+  const scrollToStory = () => document.getElementById(unlocked ? "story" : "unlock")?.scrollIntoView({ behavior: "smooth" });
+
+  const wakePhone = async () => {
+    window.setTimeout(() => setPhoneStage(1), 1800);
+  };
+
+  return (
+    <main className="site-shell">
+      <div className="grain" aria-hidden="true" />
+      {!unlocked && <div className="star-field" aria-hidden="true">{stars.map((star) => <span key={star.id} className="star" style={{ left: star.left, top: star.top, animationDelay: star.delay, width: star.size, height: star.size }} />)}</div>}
+      {coverOpen && <div className="cover-overlay" role="dialog" aria-modal="true" aria-label="Open the birthday story"><div className="bloom" aria-hidden="true">{Array.from({ length: 12 }, (_, index) => <span key={index} style={{ transform: `rotate(${index * 30}deg) translateY(-118px)` }} />)}</div><div className="cover-card"><p className="eyebrow"><Sparkles size={14} /> a tiny surprise</p><div className="cover-heart"><Heart size={24} fill="currentColor" /></div><p className="cover-from">for Shalom, my favorite person</p><h2>Tap to open<br /><em>our story.</em></h2><p>A little birthday world, made just for you.</p><button className="primary-button" onClick={() => setCoverOpen(false)}>Open the gift <ArrowRight size={17} /></button><button className="cover-skip" onClick={() => { setCoverOpen(false); window.setTimeout(() => document.getElementById(unlocked ? "story" : "unlock")?.scrollIntoView({ behavior: "smooth" }), 60); }}>skip to the story</button></div></div>}
+      <header className={`site-nav ${unlocked ? "is-unlocked" : ""}`}><a className="brand" href="#top" aria-label="Our Story home"><span className="brand-mark"><Heart size={15} fill="currentColor" /></span><span>our story</span></a><div className="nav-status"><span className="status-dot" /> a little world for Shalom</div></header>
+
+      <section id="top" className="hero"><div className="hero-art" aria-hidden="true" /><div className="hero-copy"><p className="eyebrow"><Sparkles size={14} /> a birthday love letter</p><p className="hero-kicker">For my favorite person,</p><h1>Every love story is beautiful.<br /><em>But this one is ours.</em></h1><p className="hero-description">A tiny corner of the internet made to celebrate the girl who makes my world feel softer, brighter, and a lot more fun.</p><button className="primary-button" onClick={scrollToStory}>{unlocked ? "Open your birthday letter" : "Begin our story"} {unlocked ? <Mail size={17} /> : <ArrowDown size={17} />}</button></div><div className="hero-side-note"><span>10.09.25</span><span className="side-line" /><span>chapter one</span></div></section>
+
+      {!unlocked ? <section id="unlock" className="unlock-section"><div className="unlock-card"><div className="lock-icon"><LockKeyhole size={20} /></div><p className="eyebrow">only one person knows</p><h2>There is a little secret<br /><em>waiting for you.</em></h2><p className="muted-copy">The same password from the beginning of our story unlocks everything inside.</p><div className="password-row"><input aria-label="Secret password" type="password" placeholder="Enter the secret password" value={password} onChange={(event) => setPassword(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter") unlock(); }} /><button className="primary-button compact" onClick={unlock}>Unlock <ArrowRight size={16} /></button></div>{error && <p className="error-message">{error}</p>}<p className="unlock-hint">Hint: the date that changed everything.</p></div></section> : <div id="story" className="story-content">
+        <nav className="story-nav" aria-label="Story sections"><a href="#prologue">prologue</a><a href="#chapters">chapters</a><a href="#gallery">little moments</a><a href="#soundtrack">soundtrack</a><a href="#ending">ending</a></nav>
+        <section id="prologue" className="intro-section" data-reveal><div className="section-label"><span>01</span><span className="label-line" /><span>the prologue</span></div><div className="intro-grid"><div><p className="eyebrow">before every love story</p><h2>Two people.<br /><em>Two separate lives.</em></h2></div><div className="intro-copy"><p>Before every love story, there are two people living completely different lives. Never imagining that one day, their paths would cross. This is how ours began — quietly, unexpectedly, and then all at once.</p><span className="hand-note">keep scrolling, birthday girl <Heart size={14} fill="currentColor" /></span></div></div></section>
+
+        <section id="chapters" className="timeline-section"><div className="section-label"><span>02</span><span className="label-line" /><span>chapter one / before we knew each other</span></div><div className="timeline-line" aria-hidden="true" />{memories.map((memory, index) => <article className={`memory-row ${index % 2 ? "reverse" : ""}`} data-reveal key={memory.chapter}><div className={`memory-photo ${memory.tint}`}><img src={memory.image} alt={memory.title} /><span className="photo-stamp">our story</span></div><div className="memory-copy"><p className="memory-chapter">{memory.chapter}</p><h3>{memory.title}</h3><p>{memory.body}</p><blockquote>✦ “{memory.quote}”</blockquote></div></article>)}</section>
+
+        <section className="ending-card-section" data-reveal><div className="ending-card"><p className="eyebrow">a quiet transition</p><h2>Every story has<br /><em>a beginning.</em></h2><p>Everything you've seen — every smile, every memory, every step — was quietly leading us to one unforgettable day.</p></div></section>
+
+        <section className="date-section" data-reveal><p className="eyebrow">a new chapter begins</p><div className="date-display"><span>September</span><strong>10</strong><span>2025</span></div><p>The day two separate stories finally became one. ❤️</p></section>
+
+        <section className="chapter-banner" data-reveal><p className="eyebrow">chapter two</p><h2>The Beginning of Us <em>❤️</em></h2><p>Where a simple meeting became something unforgettable.</p></section>
+        <section className="first-day-section" data-reveal><div className="first-day-photo"><img src="./media/IMG_20260731_160556_103.jpg" alt="The first day" /></div><div className="first-day-copy"><p className="eyebrow">September 10, 2025</p><h2>The First Day</h2><p>Before this day, we were just two people living our own stories. Then somehow, our paths crossed. A normal day became the beginning of something unforgettable.</p><blockquote>✦ “The greatest stories often begin with a simple moment.”</blockquote></div></section>
+
+        <section className="trust-scene" data-reveal><div className="trust-card"><p className="eyebrow">time passed</p><h2>Slowly… Slowly… <em>❤️</em></h2><p>At first, we were just two people getting to know each other. But day by day, conversations became laughter. Small moments became memories. And little by little, our trust grew stronger.</p><blockquote>✦ “The strongest bonds are built one moment at a time.”</blockquote></div></section>
+
+        <section id="gallery" className="gallery-section" data-reveal><div className="gallery-title"><p className="eyebrow">our little moments</p><h2>The memories that<br /><em>made us smile.</em></h2><p>The jokes, the random moments, and the memories that became ours.</p></div><div className="gallery-grid">{gallery.map(([src, caption]) => <figure className="photo-card" key={src}><img src={src} alt={caption} /><figcaption>{caption}</figcaption></figure>)}<figure className="video-card"><video controls preload="metadata"><source src="./media/VID_22171017_023219_866.mp4" type="video/mp4" /></video><figcaption><Play size={14} /> A moment worth replaying</figcaption></figure><figure className="video-card"><video controls preload="metadata"><source src="./media/VID_29640628_100243_461.mp4" type="video/mp4" /></video><figcaption><Play size={14} /> Another memory</figcaption></figure></div></section>
+
+        <section id="soundtrack" className="soundtrack-section" data-reveal><div><p className="eyebrow">the soundtrack of us</p><h2>Press play when<br /><em>you want to stay awhile.</em></h2><p>The song you chose now plays right here in the story. Tap play when you want a little more atmosphere.</p></div><div className="soundtrack-player youtube-player"><div className="track-info"><span>spotify · can’t help falling in love</span><strong>Can’t Help Falling in Love</strong><small>plays inside this website · sound is always user-controlled</small></div><div className="youtube-frame"><iframe src="https://open.spotify.com/embed/track/44AyOl4qVkzS48vBsbNXaC?utm_source=generator" title="Can't Help Falling in Love on Spotify" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy" /></div></div></section>
+
+        <section className="movie-pause-stack"><div className="movie-pause"><p>And before we knew it...</p><strong>You had become my favorite person.</strong></div><div className="movie-pause"><p>Every conversation...</p><strong>became something I looked forward to.</strong></div><div className="movie-pause"><p>Without even realizing it...</p><strong>you had become home. <em>💕🌸</em></strong></div></section>
+
+        <section className="chapter-banner dark" data-reveal><p className="eyebrow">chapter three</p><h2>The Little Things <em>❤️</em></h2><p>It wasn't the big moments. It was the little ones.</p></section>
+        <section className="chat-scenes">{chatScenes.map(([lead, headline, image], index) => <article className={`chat-scene ${index % 2 ? "reverse" : ""}`} data-reveal key={image}><img src={image} alt={headline} /><div><p>{lead}</p><h3>{headline}</h3></div></article>)}</section>
+
+        <section className="messages-section" data-reveal><div className="messages-title"><p className="eyebrow">the little things</p><h2>The messages I never wanted<br /><em>to forget. ❤️</em></h2><p>Small conversations that became some of my favorite memories.</p></div><div className="chat-memory-grid"><div className="chat-memory"><div className="message-bubble her">Her:<br /><strong>“Morning hun❤️”</strong></div><div className="message-bubble me">Me:<br /><strong>“Good morning princess💋😊”</strong></div><p>✦ Somehow, even a simple message from you could make my whole day better.</p></div><div className="chat-memory reverse"><div className="message-bubble her">Her:<br /><strong>“How was your day?”</strong></div><div className="message-bubble me">Me:<br /><strong>“My day was good.. maybe yours❤️”</strong></div><p>✦ It was never about what we talked about. It was about who I was talking to.</p></div></div></section>
+
+        <section className="final-scene" data-reveal><div className="phone-shell phone-sequence">
+          {phoneStage === 0 && <button className="phone-lock" onClick={wakePhone} aria-label="Wake the iPhone notification"><div className="ios-lock-time">12:00</div><div className="ios-lock-date">Tuesday, September 10</div><div className="ios-notification"><div className="notification-brand"><span className="ios-instagram-dot">◎</span><strong>Instagram</strong><time>now</time></div><p><b>Jay🦇😝</b> sent you a message ❤️</p><small>Tap to open</small></div><div className="ios-lock-hint">⌁ swipe up to open</div></button>}
+          {phoneStage === 1 && <div className="ios-home-screen"><div className="ios-status"><span>12:01</span><span>▴ ▪︎ ▪︎ 100%</span></div><div className="app-grid">{["☀️", "📸", "🗺️", "🎵", "📝", "💌", "📷", "🎞️", "🧭", "🎧", "💗", "⚙️"].map((icon, index) => <button key={index} className="ios-app"><span>{icon}</span><small>{["Weather", "Photos", "Maps", "Music", "Notes", "Mail", "Camera", "Videos", "Compass", "Podcasts", "Health", "Settings"][index]}</small></button>)}<button className="ios-app instagram-app" onClick={() => setPhoneStage(2)}><span>◎</span><small>Instagram</small></button></div><div className="swipe-hint">tap Instagram to continue <ArrowUpRight size={13} /></div><div className="ios-dock"><span>☎️</span><span>💬</span><span>◎</span><span>🌐</span></div></div>}
+          {phoneStage === 2 && <div className="instagram-home"><div className="ig-topbar"><strong>Instagram</strong><span>♡　✉</span></div><div className="ig-stories"><span><img src="./media/IMG_20260731_162504_983.jpg" alt="Jay profile" /><small>Your story</small></span><span><img src="./media/2025-05-19 19.07.18.png" alt="𝓜𝓸𝓷 𝓵𝓾𝓶𝓲è𝓻𝓮 profile" /><small>𝓜𝓸𝓷 𝓵𝓾𝓶𝓲è𝓻𝓮 🌸✨🦋</small></span><span><img src="./media/Screenshot_2026-07-31-22-22-05.png" alt="Memory" /><small>memories</small></span></div><div className="ig-feed-card"><div className="ig-feed-head"><img src="./media/IMG_20260731_162504_983.jpg" alt="Jay profile" /><strong>Jay🦇😝</strong><span>•••</span></div><img className="ig-feed-image" src="./media/IMG_20260731_132105_362.jpg" alt="Memory from Our Story" /><div className="ig-feed-actions">♡　♧　✈ <span>♡</span></div><p><b>Jay🦇😝</b> a little message for my favorite person.</p></div><div className="ig-feed-card simulated-post"><div className="ig-feed-head"><img src="./media/IMG_20260731_162504_983.jpg" alt="Jay profile" /><strong>Jay🦇😝</strong><span>•••</span></div><img className="ig-feed-image" src="./media/IMG_20260731_130750_563.jpg" alt="Another Our Story memory" /><div className="ig-feed-actions">♡　♧　✈ <span>♡</span></div><p><b>Jay🦇😝</b> keeping our favorite moments close.</p></div><div className="ig-feed-card simulated-post"><div className="ig-feed-head"><img src="./media/IMG_20260731_162504_983.jpg" alt="Jay profile" /><strong>Jay🦇😝</strong><span>•••</span></div><img className="ig-feed-image" src="./media/IMG_20260731_160327_457.jpg" alt="A trusted memory from Our Story" /><div className="ig-feed-actions">♡　♧　✈ <span>♡</span></div><p><b>Jay🦇😝</b> one more little memory for you.</p></div><div className="ig-bottom"><span>⌂</span><span>⌕</span><span>＋</span><button aria-label="Open Instagram messages" onClick={() => setPhoneStage(3)}>✉</button><span><img src="./media/IMG_20260731_162504_983.jpg" alt="Jay profile" /></span></div></div>}
+          {phoneStage === 3 && <div className="instagram-inbox"><div className="ig-topbar"><button onClick={() => setPhoneStage(2)}>‹</button><strong>Messages</strong><span>＋</span></div><div className="inbox-search">⌕　Search</div><button className="inbox-row" onClick={() => setPhoneStage(4)}><img src="./media/IMG_20260731_162504_983.jpg" alt="Jay profile" /><div><strong>Jay🦇😝</strong><p>All I want you to know is that I love you so much...</p></div><time>now</time></button><div className="inbox-row muted"><img src="./media/2025-05-19 19.07.18.png" alt="𝓜𝓸𝓷 𝓵𝓾𝓶𝓲è𝓻𝓮 profile" /><div><strong>𝓜𝓸𝓷 𝓵𝓾𝓶𝓲è𝓻𝓮 🌸✨🦋</strong><p>your memories</p></div></div></div>}
+          {phoneStage === 4 && <div className="phone-chat"><div className="ig-header"><button onClick={() => setPhoneStage(3)}>‹</button><img src="./media/IMG_20260731_162504_983.jpg" alt="Jay profile" /><div><strong>Jay🦇😝</strong><span>Active now</span></div><span className="ig-header-actions">⌕　ⓘ</span></div><div className="phone-chat-area"><div className="chat-profile-intro"><img src="./media/IMG_20260731_162504_983.jpg" alt="Jay profile" /><strong>Jay🦇😝</strong><small>Instagram</small></div><div className="phone-message mine">All I want you to know is that I love you so much. ❤️ Happy 1st Anniversary, my love.<span>12:00 AM · Seen</span></div>{replySent && <div className="phone-message her-reply">{reply}<span>12:01 AM</span></div>}</div><div className="reply-area"><input aria-label="Reply to Jay" value={reply} onChange={(event) => setReply(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter" && reply.trim()) setReplySent(true); }} placeholder="Message Jay🦇😝…" /><button aria-label="Send reply" disabled={!reply.trim()} onClick={() => setReplySent(true)}>✈</button></div></div>}
+          
+        </div></section>
+
+        <section id="ending" className="ultimate-ending" data-reveal><p>And this is only the beginning of our story... ❤️</p><h2>Thank you for becoming<br /><em>my favorite chapter.</em></h2><p>I can't wait for all the memories we are still going to create together.<br />Forever grateful for you. 💕</p><button className="primary-button" onClick={() => setLetterOpen(true)}>Read the birthday letter <Mail size={17} /></button></section>
+
+        <section className="notes-section" data-reveal><div className="notes-heading"><div><p className="eyebrow">one more thing</p><h2>Reasons I love<br /><em>doing life with you.</em></h2></div><p className="notes-intro">Some things deserve to be said more than once.</p></div><div className="note-card"><span className="note-number">0{noteIndex + 1}</span><Heart className="note-heart" size={22} fill="currentColor" /><p>{loveNotes[noteIndex]}</p><button className="note-button" onClick={() => setNoteIndex((noteIndex + 1) % loveNotes.length)}>another one <ArrowRight size={15} /></button></div></section>
+        <section className="birthday-section" data-reveal><div className="birthday-card"><p className="eyebrow">today, and every day after</p><h2>Happy birthday,<br /><em>my favorite chapter.</em></h2><p>I hope this next year brings you every soft thing, brave dream, and ridiculous laugh you deserve. Thank you for being you.</p><button className="primary-button" onClick={() => setFinalLetterOpen(true)}>There is one last thing <Mail size={17} /></button><span className="signature">always yours, <strong>♡</strong></span></div></section>
+      </div>}
+      <footer className="site-footer"><span>made with a lot of love</span><span>our story <Heart size={13} fill="currentColor" /></span><span>scroll back anytime</span></footer>
+      {letterOpen && <div className="letter-overlay" role="dialog" aria-modal="true" aria-label="Birthday letter"><div className="letter-modal"><button className="close-button" onClick={() => setLetterOpen(false)} aria-label="Close letter"><X size={18} /></button><p className="eyebrow">a note for you</p><h2>Shalom, you are<br /><em>my favorite person.</em></h2><p>I love the life we are building in all the tiny moments — the jokes, the late conversations, the ordinary days that somehow become my favorite ones.</p><p>Happy birthday to the girl who makes everything feel a little more like home. I love you, endlessly.</p><div className="letter-sign">— yours, always <Heart size={15} fill="currentColor" /></div><div className="letter-check"><Check size={15} /> letter delivered</div></div></div>}
+      {finalLetterOpen && <div className="letter-overlay" role="dialog" aria-modal="true" aria-label="Final birthday note"><div className="letter-modal final-letter"><button className="close-button" onClick={() => setFinalLetterOpen(false)} aria-label="Close final note"><X size={18} /></button><p className="eyebrow">one last little truth</p><h2>Shalom, you make<br /><em>my world softer.</em></h2><p>If I could give you one thing today, it would be the chance to see yourself through my eyes: kind, beautiful, unforgettable, and so easy to love.</p><p>Thank you for being my safe place, my favorite smile, and the person I will always choose. Happy birthday, my love.</p><div className="letter-sign">— always choosing you <Heart size={15} fill="currentColor" /></div><div className="letter-check"><Check size={15} /> one last note delivered</div></div></div>}
+    </main>
+  );
+}
